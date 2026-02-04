@@ -6,20 +6,9 @@ export interface LanguageState {
   language: Language;
 }
 
-const getInitialLanguage = (): Language => {
-  try {
-    const saved = localStorage.getItem("hustlex_language");
-    if (saved && ["en", "am", "ti", "om"].includes(saved)) {
-      return saved as Language;
-    }
-  } catch {
-    // ignore errors
-  }
-  return "en"; // Default to English
-};
-
+// Always default to "en" at build time
 const initialState: LanguageState = {
-  language: getInitialLanguage(),
+  language: "en",
 };
 
 const languageSlice = createSlice({
@@ -28,14 +17,37 @@ const languageSlice = createSlice({
   reducers: {
     setLanguage(state, { payload }: { payload: Language }) {
       state.language = payload;
-      localStorage.setItem("hustlex_language", payload);
-      // Sync with i18next if available
-      if (typeof window !== "undefined" && (window as any).i18n) {
-        (window as any).i18n.changeLanguage(payload);
+
+      // Only access localStorage and i18n in the browser
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hustlex_language", payload);
+
+          // Sync with i18next if available
+          if ((window as any).i18n) {
+            (window as any).i18n.changeLanguage(payload);
+          }
+        } catch {
+          // ignore storage errors
+        }
+      }
+    },
+
+    // Optional: load language from localStorage at runtime
+    loadLanguageFromStorage(state) {
+      if (typeof window !== "undefined") {
+        try {
+          const saved = localStorage.getItem("hustlex_language");
+          if (saved && ["en", "am", "ti", "om"].includes(saved)) {
+            state.language = saved as Language;
+          }
+        } catch {
+          // ignore errors
+        }
       }
     },
   },
 });
 
-export const { setLanguage } = languageSlice.actions;
+export const { setLanguage, loadLanguageFromStorage } = languageSlice.actions;
 export default languageSlice.reducer;

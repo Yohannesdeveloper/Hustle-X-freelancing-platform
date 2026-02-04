@@ -1,9 +1,5 @@
 /**
  * Utility to detect the backend server port dynamically
- * Tries multiple methods:
- * 1. API endpoint /api/port
- * 2. port.json file
- * 3. Common ports (5000, 5001, etc.)
  */
 
 const PORT_CACHE_KEY = 'hustlex_backend_port';
@@ -16,85 +12,12 @@ interface PortInfo {
 }
 
 /**
- * Try to detect port by attempting to fetch from API
+ * Safely parse JSON from unknown
  */
-async function detectPortFromAPI(basePort: number): Promise<number | null> {
-  const commonPorts = Array.from(new Set([basePort, 5000, 5001, 5002, 5003, 3000, 3001]));
-
-  for (const port of commonPorts) {
-    try {
-      const response = await fetch(`http://localhost:${port}/api/port`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(1000), // 1 second timeout
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.port) {
-          return data.port;
-        }
-      } else if (response.status === 429) {
-        // If we get 429, the server is there but we're rate limited
-        console.warn(`Port ${port} detected but rate limited (429)`);
-        return port;
-      }
-    } catch (error) {
-      // Port not available, try next
-      continue;
-    }
+function parseJson<T>(data: unknown): T | null {
+  if (typeof data === 'object' && data !== null) {
+    return data as T;
   }
-
-  return null;
-}
-
-/**
- * Try to read port from port.json file
- */
-async function detectPortFromFile(): Promise<number | null> {
-  try {
-    const response = await fetch('/port.json', {
-      method: 'GET',
-      signal: AbortSignal.timeout(1000),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.port) {
-        return data.port;
-      }
-    }
-  } catch (error) {
-    // File not available, continue
-  }
-
-  return null;
-}
-
-/**
- * Try common ports by checking health endpoint
- */
-async function detectPortByHealthCheck(basePort: number): Promise<number | null> {
-  const commonPorts = Array.from(new Set([basePort, 5000, 5001, 5002, 5003, 3000, 3001]));
-
-  for (const port of commonPorts) {
-    try {
-      const response = await fetch(`http://localhost:${port}/api/health`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(1000),
-      });
-
-      if (response.ok || response.status === 429) {
-        if (response.status === 429) {
-          console.warn(`Port ${port} detected by health check but rate limited (429)`);
-        }
-        return port;
-      }
-    } catch (error) {
-      // Port not available, try next
-      continue;
-    }
-  }
-
   return null;
 }
 
@@ -102,19 +25,18 @@ async function detectPortByHealthCheck(basePort: number): Promise<number | null>
  * Get cached port if still valid
  */
 function getCachedPort(): number | null {
+  if (typeof window === 'undefined') return null;
+
   try {
     const cached = localStorage.getItem(PORT_CACHE_KEY);
     if (cached) {
-      const portInfo: PortInfo = JSON.parse(cached);
-      const now = Date.now();
-
-      // Check if cache is still valid
-      if (now - portInfo.timestamp < PORT_CACHE_TIMEOUT) {
+      const portInfo = parseJson<PortInfo>(JSON.parse(cached));
+      if (portInfo && Date.now() - portInfo.timestamp < PORT_CACHE_TIMEOUT) {
         return portInfo.port;
       }
     }
-  } catch (error) {
-    // Invalid cache, ignore
+  } catch {
+    // ignore invalid cache
   }
 
   return null;
@@ -124,103 +46,114 @@ function getCachedPort(): number | null {
  * Cache the detected port
  */
 function cachePort(port: number): void {
+  if (typeof window === 'undefined') return;
+
   try {
-    const portInfo: PortInfo = {
-      port,
-      url: `http://localhost:${port}`,
-      timestamp: Date.now(),
-    };
+    const portInfo: PortInfo = { port, url: `http://localhost:${port}`, timestamp: Date.now() };
     localStorage.setItem(PORT_CACHE_KEY, JSON.stringify(portInfo));
-  } catch (error) {
-    // localStorage not available, ignore
+  } catch {
+    // ignore localStorage errors
   }
+}
+
+/**
+ * Generic fetch helper with timeout
+ */
+async function fetchJson<T>(url: string, timeout = 1000): Promise<T | null> {
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(timeout) });
+    if (response.ok) {
+      const data = await response.json();
+      return parseJson<T>(data);
+    }
+  } catch {
+    // ignore errors
+  }
+  return null;
 }
 
 /**
  * Detect backend port using multiple methods
  */
-export async function detectBackendPort(basePort: number = 5000): Promise<number> {
-  // Check cache first
+export async function detectBackendPort(basePort = 5000): Promise<number> {
+  // 1️⃣ Check cache first
   const cachedPort = getCachedPort();
   if (cachedPort) {
-    // Verify cached port is still working
     try {
-      const response = await fetch(`http://localhost:${cachedPort}/api/health`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(500),
-      });
-      if (response.ok || response.status === 429) {
-        return cachedPort;
-      }
-    } catch (error) {
-      // Cached port not working, continue detection
+      const resp = await fetch(`http://localhost:${cachedPort}/api/health`, { signal: AbortSignal.timeout(500) });
+      if (resp.ok || resp.status === 429) return cachedPort;
+    } catch {
+      // cached port not working
     }
   }
 
-  // Try API endpoint first (most reliable)
-  let detectedPort = await detectPortFromAPI(basePort);
-  if (detectedPort) {
-    cachePort(detectedPort);
-    return detectedPort;
+  const commonPorts = Array.from(new Set([basePort, 5000, 5001, 5002, 5003, 3000, 3001]));
+
+  // 2️⃣ Try API endpoint
+  for (const port of commonPorts) {
+    const data = await fetchJson<{ port: number }>(`http://localhost:${port}/api/port`);
+    if (data?.port) {
+      cachePort(data.port);
+      return data.port;
+    }
   }
 
-  // Try reading from port.json file
-  detectedPort = await detectPortFromFile();
-  if (detectedPort) {
-    cachePort(detectedPort);
-    return detectedPort;
+  // 3️⃣ Try port.json
+  const fileData = await fetchJson<{ port: number }>('/port.json');
+  if (fileData?.port) {
+    cachePort(fileData.port);
+    return fileData.port;
   }
 
-  // Try health check on common ports
-  detectedPort = await detectPortByHealthCheck(basePort);
-  if (detectedPort) {
-    cachePort(detectedPort);
-    return detectedPort;
+  // 4️⃣ Try health check
+  for (const port of commonPorts) {
+    try {
+      const resp = await fetch(`http://localhost:${port}/api/health`, { signal: AbortSignal.timeout(1000) });
+      if (resp.ok || resp.status === 429) {
+        cachePort(port);
+        return port;
+      }
+    } catch {
+      continue;
+    }
   }
 
-  // Fallback to base port
+  // 5️⃣ Fallback
   return basePort;
 }
 
 /**
- * Get backend base URL
+ * Get backend URL
  */
 export async function getBackendUrl(): Promise<string> {
-  if (typeof window !== 'undefined' && window.location.hostname.includes("devtunnels")) {
+  if (typeof window !== 'undefined' && window.location.hostname.includes('devtunnels')) {
     return `https://${window.location.hostname}`;
   }
-
-  const port = await detectBackendPort(5000);
+  const port = await detectBackendPort();
   return `http://localhost:${port}`;
 }
 
-/**
- * Get backend API URL
- */
 export async function getBackendApiUrl(): Promise<string> {
-  const baseUrl = await getBackendUrl();
-  return `${baseUrl}/api`;
+  const base = await getBackendUrl();
+  return `${base}/api`;
 }
 
 /**
- * Synchronous version that uses cached port or falls back to default
- * Use this for immediate needs, but prefer async versions
+ * Synchronous versions (use cached or default)
  */
-export function getBackendPortSync(defaultPort: number = 5000): number {
+export function getBackendPortSync(defaultPort = 5000): number {
   const cached = getCachedPort();
   return cached || defaultPort;
 }
 
 export function getBackendUrlSync(): string {
-  if (typeof window !== 'undefined' && window.location.hostname.includes("devtunnels")) {
+  if (typeof window !== 'undefined' && window.location.hostname.includes('devtunnels')) {
     return `https://${window.location.hostname}`;
   }
-
-  const port = getBackendPortSync(5000);
+  const port = getBackendPortSync();
   return `http://localhost:${port}`;
 }
 
 export function getBackendApiUrlSync(): string {
-  const baseUrl = getBackendUrlSync();
-  return `${baseUrl}/api`;
+  return `${getBackendUrlSync()}/api`;
 }
