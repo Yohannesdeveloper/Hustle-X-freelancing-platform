@@ -8,7 +8,7 @@ import { FaUser, FaSun, FaMoon } from "react-icons/fa";
 import { MoreVertical } from "lucide-react";
 import { toggleTheme } from "../store/themeSlice";
 
-const FloatingDarkModeToggle: React.FC = () => {
+const FloatingDarkModeToggle: React.FC<{ showProfileOption?: boolean }> = ({ showProfileOption = true }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -113,7 +113,7 @@ const FloatingDarkModeToggle: React.FC = () => {
               : "bg-white/95 border border-black/10"
               }`}
           >
-            {isAuthenticated && (
+            {isAuthenticated && showProfileOption && (
               <button
                 onClick={handleProfileClick}
                 className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-semibold transition-colors ${darkMode

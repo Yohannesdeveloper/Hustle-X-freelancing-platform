@@ -64,7 +64,7 @@ const HomeNavbar: React.FC = () => {
   }, [languageMenuOpen]);
 
   // Don't show navbar on job-listings and job-details pages
-  if (location.pathname === "/job-listings" || location.pathname.startsWith("/job-details") || location.pathname === "/preview-job") {
+  if (location.pathname === "/job-listings" || location.pathname.startsWith("/job-details") || location.pathname === "/preview-job" || location.pathname === "/blog/post") {
     return null;
   }
 

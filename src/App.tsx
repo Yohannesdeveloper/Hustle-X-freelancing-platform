@@ -37,6 +37,7 @@ import JobModeration from "./Pages/JobModeration";
 import FreelancerProfileWizard from "./components/FreelancerProfileWizard";
 import ClientProfileWizard from "./components/ClientProfileWizard";
 import ProfileSetupRouter from "./components/ProfileSetupRouter";
+import ProtectedRoute from "./components/ProtectedRoute";
 import AccountSettings from "./Pages/AccountSettings";
 import CompanyProfile from "./Pages/CompanyProfile";
 
@@ -65,8 +66,22 @@ function AppContent() {
         <Route path="/homefinal" element={<Navigate to="/" replace />} />
         <Route path="/post-job" element={<PostJob />} />
         <Route path="/preview-job" element={<PageLayout><PreviewJob /></PageLayout>} />
-        <Route path="/dashboard/hiring" element={<Hiringdashboard />} />
-        <Route path="/dashboard/freelancer" element={<FreelancingDashboard />} />
+        <Route
+          path="/dashboard/hiring"
+          element={
+            <ProtectedRoute requireRole="client" requireProfileComplete={true}>
+              <Hiringdashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/freelancer"
+          element={
+            <ProtectedRoute requireRole="freelancer" requireProfileComplete={true}>
+              <FreelancingDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/job-listings" element={<JobListings />} />
         <Route path="/job-details/:jobId" element={<PageLayout><JobDetailsMongo /></PageLayout>} />
         <Route path="/edit-job/:id" element={<PageLayout><EditJobMongo /></PageLayout>} />
@@ -88,7 +103,7 @@ function AppContent() {
         <Route path="/payment-wizard" element={<PaymentWizard />} />
         <Route path="/api" element={<PageLayout><API /></PageLayout>} />
         <Route path="/freelancer-profile-setup" element={<FreelancerProfileWizard />} />
-        <Route path="/profile-setup" element={<PageLayout><ProfileSetupRouter /></PageLayout>} />
+        <Route path="/profile-setup" element={<ProfileSetupRouter />} />
         <Route path="/company-profile" element={<PageLayout><CompanyProfile /></PageLayout>} />
 
         <Route path="/applications-management" element={<PageLayout><ApplicationsManagementMongo /></PageLayout>} />

@@ -50,7 +50,7 @@ interface StepProps {
   isLast: boolean;
   onSubmit?: () => void;
   navigate?: any;
-  refreshUser?: () => Promise<void>;
+  refreshUser?: () => Promise<any>;
 }
 
 const steps = [
@@ -191,6 +191,14 @@ const FreelancerProfileWizard: React.FC = () => {
       {/* Header */}
       <div className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-900/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
         <div className="max-w-4xl mx-auto px-6 py-4">
+          {/* Important Notice */}
+          <div className={`mb-4 p-3 rounded-lg border ${darkMode ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+            <p className="text-sm font-medium flex items-center gap-2">
+              <span className="text-xl">ℹ️</span>
+              <span>Please complete your freelancer profile to access the dashboard</span>
+            </p>
+          </div>
+
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               {/* Profile Picture in Header */}
@@ -216,15 +224,14 @@ const FreelancerProfileWizard: React.FC = () => {
               {steps.map((step) => (
                 <div
                   key={step.id}
-                  className={`w-3 h-3 rounded-full ${
-                    step.id < currentStep
-                      ? 'bg-blue-500'
-                      : step.id === currentStep
+                  className={`w-3 h-3 rounded-full ${step.id < currentStep
+                    ? 'bg-blue-500'
+                    : step.id === currentStep
                       ? 'bg-blue-600'
                       : darkMode
-                      ? 'bg-gray-600'
-                      : 'bg-gray-300'
-                  }`}
+                        ? 'bg-gray-600'
+                        : 'bg-gray-300'
+                    }`}
                 />
               ))}
             </div>
@@ -302,9 +309,8 @@ const BasicInfoStep: React.FC<StepProps> = ({ data, updateData, onNext, isFirst,
       {/* Profile Picture Upload */}
       <div className="flex justify-center mb-8">
         <div className="text-center">
-          <div className={`relative w-32 h-32 mx-auto mb-4 rounded-full border-4 border-dashed ${
-            darkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'
-          } transition-colors overflow-hidden`}>
+          <div className={`relative w-32 h-32 mx-auto mb-4 rounded-full border-4 border-dashed ${darkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'
+            } transition-colors overflow-hidden`}>
             {data.profilePicturePreview ? (
               <img
                 src={data.profilePicturePreview}
@@ -312,9 +318,8 @@ const BasicInfoStep: React.FC<StepProps> = ({ data, updateData, onNext, isFirst,
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className={`w-full h-full flex items-center justify-center ${
-                darkMode ? 'bg-gray-800' : 'bg-gray-100'
-              }`}>
+              <div className={`w-full h-full flex items-center justify-center ${darkMode ? 'bg-gray-800' : 'bg-gray-100'
+                }`}>
                 <div className="text-center">
                   <div className={`text-4xl mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     👤
@@ -361,11 +366,10 @@ const BasicInfoStep: React.FC<StepProps> = ({ data, updateData, onNext, isFirst,
             type="text"
             value={data.firstName}
             onChange={(e) => updateData('firstName', e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="Enter your first name"
           />
         </div>
@@ -378,11 +382,10 @@ const BasicInfoStep: React.FC<StepProps> = ({ data, updateData, onNext, isFirst,
             type="text"
             value={data.lastName}
             onChange={(e) => updateData('lastName', e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="Enter your last name"
           />
         </div>
@@ -395,11 +398,10 @@ const BasicInfoStep: React.FC<StepProps> = ({ data, updateData, onNext, isFirst,
             type="email"
             value={data.email}
             onChange={(e) => updateData('email', e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="your.email@example.com"
           />
         </div>
@@ -412,11 +414,10 @@ const BasicInfoStep: React.FC<StepProps> = ({ data, updateData, onNext, isFirst,
             type="tel"
             value={data.phone}
             onChange={(e) => updateData('phone', e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="+251 XXX XXX XXX"
           />
         </div>
@@ -429,11 +430,10 @@ const BasicInfoStep: React.FC<StepProps> = ({ data, updateData, onNext, isFirst,
             type="text"
             value={data.location}
             onChange={(e) => updateData('location', e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="City, Country"
           />
         </div>
@@ -490,11 +490,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
             value={data.bio}
             onChange={(e) => updateData('bio', e.target.value)}
             rows={4}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="Tell us about yourself, your background, and what makes you unique..."
           />
         </div>
@@ -508,11 +507,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
             value={data.education}
             onChange={(e) => updateData('education', e.target.value)}
             rows={3}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="List your educational background, degrees, certifications, etc."
           />
         </div>
@@ -526,11 +524,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
             value={data.workExperience}
             onChange={(e) => updateData('workExperience', e.target.value)}
             rows={4}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="Describe your professional experience, previous roles, achievements, etc."
           />
         </div>
@@ -544,11 +541,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
             type="text"
             value={data.skills.join(', ')}
             onChange={(e) => updateData('skills', e.target.value.split(',').map(skill => skill.trim()).filter(skill => skill))}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="e.g., JavaScript, React, Node.js, Python (separate with commas)"
           />
         </div>
@@ -562,11 +558,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
             type="text"
             value={data.certifications.join(', ')}
             onChange={(e) => updateData('certifications', e.target.value.split(',').map(cert => cert.trim()).filter(cert => cert))}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="e.g., AWS Certified, PMP, Google Analytics (separate with commas)"
           />
         </div>
@@ -580,13 +575,12 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
               <button
                 key={level}
                 onClick={() => updateData('experienceLevel', level)}
-                className={`p-3 rounded-lg border text-sm font-medium transition-all ${
-                  data.experienceLevel === level
-                    ? 'bg-blue-500 border-blue-500 text-white'
-                    : darkMode
+                className={`p-3 rounded-lg border text-sm font-medium transition-all ${data.experienceLevel === level
+                  ? 'bg-blue-500 border-blue-500 text-white'
+                  : darkMode
                     ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {level}
               </button>
@@ -602,11 +596,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
             type="text"
             value={data.yearsOfExperience}
             onChange={(e) => updateData('yearsOfExperience', e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="e.g., 3 years"
           />
         </div>
@@ -620,13 +613,12 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
               <button
                 key={status}
                 onClick={() => updateData('availability', status)}
-                className={`p-3 rounded-lg border text-sm font-medium transition-all ${
-                  data.availability === status
-                    ? 'bg-green-500 border-green-500 text-white'
-                    : darkMode
+                className={`p-3 rounded-lg border text-sm font-medium transition-all ${data.availability === status
+                  ? 'bg-green-500 border-green-500 text-white'
+                  : darkMode
                     ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {status}
               </button>
@@ -642,11 +634,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
             type="url"
             value={data.portfolioUrl}
             onChange={(e) => updateData('portfolioUrl', e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              darkMode
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg border ${darkMode
+              ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             placeholder="https://yourportfolio.com"
           />
         </div>
@@ -660,11 +651,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
               type="url"
               value={data.linkedinUrl}
               onChange={(e) => updateData('linkedinUrl', e.target.value)}
-              className={`w-full px-4 py-3 rounded-lg border ${
-                darkMode
-                  ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+              className={`w-full px-4 py-3 rounded-lg border ${darkMode
+                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
               placeholder="https://linkedin.com/in/yourprofile"
             />
           </div>
@@ -677,11 +667,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
               type="url"
               value={data.githubUrl}
               onChange={(e) => updateData('githubUrl', e.target.value)}
-              className={`w-full px-4 py-3 rounded-lg border ${
-                darkMode
-                  ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+              className={`w-full px-4 py-3 rounded-lg border ${darkMode
+                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
               placeholder="https://github.com/yourusername"
             />
           </div>
@@ -694,14 +683,12 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
 
           {/* Show existing CV if available */}
           {data.existingCvUrl && !data.cvFile && (
-            <div className={`mb-4 p-4 rounded-lg border ${
-              darkMode ? 'bg-gray-800 border-gray-600' : 'bg-gray-50 border-gray-200'
-            }`}>
+            <div className={`mb-4 p-4 rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-gray-50 border-gray-200'
+              }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    darkMode ? 'bg-gray-700' : 'bg-gray-200'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${darkMode ? 'bg-gray-700' : 'bg-gray-200'
+                    }`}>
                     📄
                   </div>
                   <div>
@@ -728,9 +715,8 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
             </div>
           )}
 
-          <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-            darkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'
-          } transition-colors`}>
+          <div className={`border-2 border-dashed rounded-lg p-6 text-center ${darkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'
+            } transition-colors`}>
             <input
               type="file"
               accept=".pdf,.doc,.docx"
@@ -739,9 +725,8 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
               id="cv-upload"
             />
             <label htmlFor="cv-upload" className="cursor-pointer">
-              <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                darkMode ? 'bg-gray-700' : 'bg-gray-100'
-              }`}>
+              <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center ${darkMode ? 'bg-gray-700' : 'bg-gray-100'
+                }`}>
                 📄
               </div>
               <p className={`text-sm mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -774,11 +759,10 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onPrev}
-          className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 ${
-            darkMode
-              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
+          className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 ${darkMode
+            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
         >
           Previous
         </motion.button>
@@ -793,8 +777,8 @@ const ProfessionalDetailsStep: React.FC<StepProps> = ({ data, updateData, onNext
         </motion.button>
       </div>
     </div>
- 
-);
+
+  );
 };
 
 
@@ -937,18 +921,16 @@ const ReviewStep: React.FC<StepProps> = ({ data, onPrev, onSubmit, isFirst, isLa
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center ${
-                darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
-              } border-2 shadow-md`}>
+              <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
+                } border-2 shadow-md`}>
                 <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
             </div>
           ) : (
-            <div className={`w-32 h-32 rounded-full flex items-center justify-center mb-4 border-4 ${
-              darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-200 border-gray-300'
-            }`}>
+            <div className={`w-32 h-32 rounded-full flex items-center justify-center mb-4 border-4 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-200 border-gray-300'
+              }`}>
               <span className="text-4xl font-bold text-gray-500">
                 {data.firstName?.charAt(0)}{data.lastName?.charAt(0)}
               </span>
@@ -979,11 +961,10 @@ const ReviewStep: React.FC<StepProps> = ({ data, onPrev, onSubmit, isFirst, isLa
           </div>
           <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
             <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Availability:</span>
-            <span className={`text-right px-2 py-1 rounded-full text-xs font-medium ${
-              data.availability === 'Available'
-                ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
-            }`}>
+            <span className={`text-right px-2 py-1 rounded-full text-xs font-medium ${data.availability === 'Available'
+              ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+              : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
+              }`}>
               {data.availability}
             </span>
           </div>
@@ -1078,11 +1059,10 @@ const ReviewStep: React.FC<StepProps> = ({ data, onPrev, onSubmit, isFirst, isLa
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onPrev}
-          className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 ${
-            darkMode
-              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
+          className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 ${darkMode
+            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
         >
           Previous
         </motion.button>

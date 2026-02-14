@@ -220,7 +220,7 @@ class ApiService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.token;
+    return !!(this.token || localStorage.getItem("token"));
   }
 
   setToken(token: string) {
@@ -632,17 +632,17 @@ class ApiService {
 
   async likeBlog(blogId: string): Promise<{ likes: number }> {
     const response = await axios.post(`${this.baseUrl}/blogs/${blogId}/like`);
-    return response.data;
+    return response.data as { likes: number };
   }
 
   async unlikeBlog(blogId: string): Promise<{ likes: number }> {
     const response = await axios.post(`${this.baseUrl}/blogs/${blogId}/unlike`);
-    return response.data;
+    return response.data as { likes: number };
   }
 
   async getBlogCategories(): Promise<string[]> {
     const response = await axios.get(`${this.baseUrl}/blogs/meta/categories`);
-    return response.data;
+    return response.data as string[];
   }
 
   async getBlogStats(): Promise<{
@@ -652,7 +652,12 @@ class ApiService {
     totalLikes: number;
   }> {
     const response = await axios.get(`${this.baseUrl}/blogs/meta/stats`);
-    return response.data;
+    return response.data as {
+      totalBlogs: number;
+      categories: Record<string, number>;
+      totalViews: number;
+      totalLikes: number;
+    };
   }
 
   // Messaging Methods have been removed
@@ -666,11 +671,13 @@ class ApiService {
     currentRole: string;
     createdAt: string;
   }>> {
-    if (!this.token) {
+    const token = localStorage.getItem("token") || this.token;
+    if (!token) {
       throw new Error("Authentication required");
     }
     const response = await axios.get(`${this.baseUrl}/users/freelancers`);
-    return (response.data.freelancers || []) as Array<{
+    const data = response.data as any;
+    return (data.freelancers || []) as Array<{
       _id: string;
       email: string;
       profile?: any;
@@ -696,11 +703,13 @@ class ApiService {
       industry: string;
     };
   }>> {
-    if (!this.token) {
+    const token = localStorage.getItem("token") || this.token;
+    if (!token) {
       throw new Error("Authentication required");
     }
     const response = await axios.get(`${this.baseUrl}/users/clients`);
-    return (response.data.clients || []) as Array<{
+    const data = response.data as any;
+    return (data.clients || []) as Array<{
       _id: string;
       email: string;
       profile?: any;
@@ -731,14 +740,23 @@ class ApiService {
       throw new Error("Authentication required");
     }
     const response = await axios.get(`${this.baseUrl}/users/${userId}`);
-    return response.data.user;
+    const data = response.data as any;
+    return data.user as {
+      _id: string;
+      email: string;
+      profile?: any;
+      roles: string[];
+      currentRole: string;
+      createdAt: string;
+      companyProfile?: any;
+    };
   }
 
   // Get freelancers with status information
   async getFreelancersWithStatus(): Promise<FreelancerWithStatus[]> {
     try {
       const response = await axios.get(`${this.baseUrl}/users/freelancers`);
-      const freelancers = (response.data.freelancers || []) as FreelancerWithStatus[];
+      const freelancers = ((response.data as any).freelancers || []) as FreelancerWithStatus[];
 
       // Add mock status for now (can be replaced with real status from backend)
       return freelancers.map((freelancer) => ({
@@ -762,7 +780,8 @@ class ApiService {
   }> {
     try {
       const response = await axios.get(`${this.baseUrl}/users/freelancers/${freelancerId}`);
-      const freelancer = response.data.freelancer;
+      const data = response.data as any;
+      const freelancer = data.freelancer as any;
 
       return {
         url: freelancer.profile?.portfolioUrl || freelancer.profile?.portfolio || "",
@@ -778,7 +797,7 @@ class ApiService {
   async getConversationMessages(conversationId: string): Promise<any[]> {
     try {
       const response = await axios.get(`${this.baseUrl}/messages/conversation/${conversationId}`);
-      return response.data || [];
+      return (response.data || []) as any[];
     } catch (error: any) {
       console.error("Error fetching conversation messages:", error);
       throw error;
@@ -787,7 +806,8 @@ class ApiService {
 
   // Edit a message
   async editMessage(messageId: string, message: string): Promise<any> {
-    if (!this.token) {
+    const token = localStorage.getItem("token") || this.token;
+    if (!token) {
       throw new Error("Authentication required");
     }
     try {
@@ -801,7 +821,8 @@ class ApiService {
 
   // Send payment request to phone number via Santim Pay
   async sendPaymentRequest(phoneNumber: string, planId: string, amount: number, currency: string): Promise<any> {
-    if (!this.token) {
+    const token = localStorage.getItem("token") || this.token;
+    if (!token) {
       throw new Error("Authentication required");
     }
     try {
@@ -820,7 +841,8 @@ class ApiService {
 
   // Subscribe to a pricing plan
   async subscribeToPlan(planId: string, paymentMethod: string): Promise<any> {
-    if (!this.token) {
+    const token = localStorage.getItem("token") || this.token;
+    if (!token) {
       throw new Error("Authentication required");
     }
     try {
@@ -840,7 +862,8 @@ class ApiService {
     message: string;
     freelancer: string;
   }> {
-    if (!this.token) {
+    const token = localStorage.getItem("token") || this.token;
+    if (!token) {
       throw new Error("Authentication required");
     }
     const response = await axios.delete(`${this.baseUrl}/users/freelancers/${freelancerId}`);

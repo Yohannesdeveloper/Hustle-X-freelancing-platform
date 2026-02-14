@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
+import { FaApple, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "../store/hooks";
 import { useAppSelector } from "../store/hooks";
 import { useTranslation } from "../hooks/useTranslation";
@@ -27,6 +27,8 @@ const Signup: React.FC = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedRoleForLogin, setSelectedRoleForLogin] = useState<string | null>(null);
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const emailCheckTimeout = useRef<number | null>(null);
 
   // Get redirect path from URL params
@@ -252,11 +254,11 @@ const Signup: React.FC = () => {
         return;
       }
 
-      // Priority 2: Redirect to appropriate dashboard based on role
+      // Priority 2: Redirect to profile setup for new accounts
       if (role === 'freelancer') {
-        navigate('/dashboard/freelancer', { replace: true });
+        navigate('/profile-setup?role=freelancer', { replace: true });
       } else if (role === 'client') {
-        navigate('/dashboard/hiring', { replace: true });
+        navigate('/profile-setup?role=client', { replace: true });
       } else {
         navigate('/job-listings', { replace: true });
       }
@@ -403,19 +405,28 @@ const Signup: React.FC = () => {
             </p>
 
             <form onSubmit={handleLogin} className="space-y-4">
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                name="password"
-                required
-                className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 ${darkMode
-                  ? "bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400"
-                  : "bg-white/50 border-gray-300/50 text-gray-900 placeholder-gray-500"
-                  }`}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  name="password"
+                  required
+                  className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 ${darkMode
+                    ? "bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400"
+                    : "bg-white/50 border-gray-300/50 text-gray-900 placeholder-gray-500"
+                    }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"}`}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
 
               <button
                 type="button"
@@ -594,32 +605,50 @@ const Signup: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-                name="password"
-                required
-                className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 ${darkMode
-                  ? "bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400"
-                  : "bg-white/50 border-gray-300/50 text-gray-900 placeholder-gray-500"
-                  }`}
-              />
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                name="confirmPassword"
-                required
-                className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 ${darkMode
-                  ? "bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400"
-                  : "bg-white/50 border-gray-300/50 text-gray-900 placeholder-gray-500"
-                  }`}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  name="password"
+                  required
+                  className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 ${darkMode
+                    ? "bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400"
+                    : "bg-white/50 border-gray-300/50 text-gray-900 placeholder-gray-500"
+                    }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${darkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"}`}
+                >
+                  {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  name="confirmPassword"
+                  required
+                  className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 ${darkMode
+                    ? "bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400"
+                    : "bg-white/50 border-gray-300/50 text-gray-900 placeholder-gray-500"
+                    }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${darkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"}`}
+                >
+                  {showConfirmPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-2">

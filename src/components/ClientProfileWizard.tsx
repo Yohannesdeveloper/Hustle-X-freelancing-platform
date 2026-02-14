@@ -40,7 +40,7 @@ interface StepProps {
   isFirst: boolean;
   isLast: boolean;
   onSubmit?: () => void;
-  refreshUser?: () => Promise<void>;
+  refreshUser?: () => Promise<any>;
 }
 
 const steps = [
@@ -52,7 +52,7 @@ const steps = [
 const ClientProfileWizard: React.FC = () => {
   const darkMode = useSelector((state: RootState) => state.theme.darkMode);
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { refreshUser, user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<ClientProfileData>({
@@ -91,11 +91,20 @@ const ClientProfileWizard: React.FC = () => {
           return sizeMap[size] || size;
         };
 
-        const logoUrl = companyProfile.logo
+        const companyLogoUrl = companyProfile.logo
           ? (companyProfile.logo.startsWith('http') || companyProfile.logo.startsWith('data:')
             ? companyProfile.logo
             : apiService.getFileUrl(companyProfile.logo))
           : null;
+
+        // Fallback to user profile picture if company logo is missing
+        const userProfilePic = user?.profile?.avatar
+          ? (user.profile.avatar.startsWith('http') || user.profile.avatar.startsWith('data:')
+            ? user.profile.avatar
+            : apiService.getFileUrl(user.profile.avatar))
+          : null;
+
+        const logoUrl = companyLogoUrl || userProfilePic;
 
         setProfileData(prev => ({
           ...prev,
@@ -115,14 +124,28 @@ const ClientProfileWizard: React.FC = () => {
           taxId: companyProfile.taxId ?? prev.taxId,
         }));
       } catch {
-        // No existing profile - keep defaults (new signup)
+        // No existing profile - check for user profile picture for new profile
+        const userProfilePic = user?.profile?.avatar
+          ? (user.profile.avatar.startsWith('http') || user.profile.avatar.startsWith('data:')
+            ? user.profile.avatar
+            : apiService.getFileUrl(user.profile.avatar))
+          : null;
+
+        if (userProfilePic) {
+          setProfileData(prev => ({
+            ...prev,
+            logoPreview: userProfilePic
+          }));
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    loadExistingProfile();
-  }, []);
+    if (loading) {
+      loadExistingProfile();
+    }
+  }, [loading, user]);
 
   const updateData = (field: keyof ClientProfileData, value: any) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
@@ -178,6 +201,14 @@ const ClientProfileWizard: React.FC = () => {
       {/* Header */}
       <div className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-900/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
         <div className="max-w-4xl mx-auto px-6 py-4">
+          {/* Important Notice */}
+          <div className={`mb-4 p-3 rounded-lg border ${darkMode ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+            <p className="text-sm font-medium flex items-center gap-2">
+              <span className="text-xl">ℹ️</span>
+              <span>Please complete your company profile to access the client dashboard</span>
+            </p>
+          </div>
+
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">Client Profile Setup</h1>
@@ -189,15 +220,14 @@ const ClientProfileWizard: React.FC = () => {
               {steps.map((step) => (
                 <div
                   key={step.id}
-                  className={`w-3 h-3 rounded-full ${
-                    step.id < currentStep
-                      ? 'bg-green-500'
-                      : step.id === currentStep
+                  className={`w-3 h-3 rounded-full ${step.id < currentStep
+                    ? 'bg-green-500'
+                    : step.id === currentStep
                       ? 'bg-green-600'
                       : darkMode
-                      ? 'bg-gray-600'
-                      : 'bg-gray-300'
-                  }`}
+                        ? 'bg-gray-600'
+                        : 'bg-gray-300'
+                    }`}
                 />
               ))}
             </div>

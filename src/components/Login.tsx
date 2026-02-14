@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
+import { FaApple, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "../store/hooks";
 import { useAppSelector } from "../store/hooks";
 import { useTranslation } from "../hooks/useTranslation";
@@ -30,6 +30,7 @@ const Login: React.FC = () => {
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleGoogleLogin = async () => {
     setError(null);
@@ -197,17 +198,26 @@ const Login: React.FC = () => {
               }`}
             required
           />
-          <input
-            type="password"
-            placeholder={t.login.password}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`w-full p-4 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 ${darkMode
-              ? "bg-gray-900/50 text-white border-gray-700/50 placeholder:text-gray-400"
-              : "bg-white/50 text-gray-900 border-gray-300/50 placeholder:text-gray-500"
-              }`}
-            required
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder={t.login.password}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`w-full p-4 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 ${darkMode
+                ? "bg-gray-900/50 text-white border-gray-700/50 placeholder:text-gray-400"
+                : "bg-white/50 text-gray-900 border-gray-300/50 placeholder:text-gray-500"
+                }`}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${darkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"}`}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
 
           <div className="flex justify-end">
             <button

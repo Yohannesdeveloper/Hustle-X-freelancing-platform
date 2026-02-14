@@ -447,169 +447,108 @@ const FindFreelancersTab: React.FC<FindFreelancersTabProps> = ({
             </div>
           </motion.div>
         ) : filteredFreelancers.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="flex flex-col gap-2">
             {filteredFreelancers.map((freelancer, index) => {
               const profile = freelancer.profile || {};
               const fullName = `${profile.firstName || ""} ${profile.lastName || ""}`.trim() || freelancer.email;
               const primarySkill = profile.primarySkill || profile.skills?.[0] || "Freelancer";
               const location = profile.location || "Not specified";
-              const monthlyRate = profile.monthlyRate || "0";
-              const currency = profile.currency || "ETB";
 
               return (
                 <motion.div
                   key={freelancer._id}
-                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
                   transition={{
-                    delay: index * 0.05,
+                    delay: index * 0.03,
                     type: "spring",
-                    stiffness: 100,
-                    damping: 15
+                    stiffness: 120,
+                    damping: 20
                   }}
                   whileHover={{
-                    y: -8,
-                    scale: 1.02,
+                    scale: 1.005,
+                    x: 4,
                     transition: { duration: 0.2 }
                   }}
-                  className={`group relative rounded-2xl border-2 p-6 cursor-pointer transition-all backdrop-blur-xl overflow-hidden ${darkMode
-                    ? "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-cyan-500/30 hover:border-cyan-500 hover:shadow-[0_0_40px_rgba(6,182,212,0.4)]"
-                    : "bg-gradient-to-br from-white to-gray-50/50 border-cyan-200 hover:border-cyan-400 hover:shadow-2xl"
+                  className={`group relative rounded-xl border p-3 md:p-4 cursor-pointer transition-all backdrop-blur-xl overflow-hidden ${darkMode
+                    ? "bg-gradient-to-r from-gray-800/40 to-gray-900/40 border-white/5 hover:border-cyan-500/40 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)]"
+                    : "bg-white border-gray-100 hover:border-cyan-400/50 hover:shadow-lg"
                     }`}
                   onClick={() => handleViewProfile(freelancer)}
                 >
-                  {/* Shine Effect */}
-                  <motion.div
-                    className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${darkMode
-                      ? "bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent"
-                      : "bg-gradient-to-r from-transparent via-cyan-100/50 to-transparent"
-                      }`}
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 0.6 }}
-                  />
-
-                  <div className="relative z-10">
-                    <div className="flex items-start gap-4 mb-4">
-                      {/* Avatar */}
-                      <motion.div
-                        className="relative flex-shrink-0"
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        transition={{ type: "spring", stiffness: 400 }}
+                  <div className="relative z-10 flex items-center gap-4">
+                    {/* Compact Avatar */}
+                    <div className="relative flex-shrink-0">
+                      <div
+                        className={`w-10 h-10 md:w-12 md:h-12 rounded-xl ${darkMode
+                          ? "bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30"
+                          : "bg-gradient-to-br from-cyan-100 to-blue-100 border border-cyan-200"
+                          } flex items-center justify-center text-lg md:text-xl font-bold shadow-sm`}
                       >
-                        <div
-                          className={`w-16 h-16 rounded-2xl ${darkMode
-                            ? "bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border-2 border-cyan-500/50"
-                            : "bg-gradient-to-br from-cyan-100 to-blue-100 border-2 border-cyan-200"
-                            } flex items-center justify-center text-2xl font-bold shadow-lg`}
-                        >
-                          {fullName.charAt(0).toUpperCase()}
+                        {fullName.charAt(0).toUpperCase()}
+                      </div>
+                      {freelancer.status && (
+                        <div className="absolute -bottom-0.5 -right-0.5 scale-75">
+                          <StatusIndicator status={freelancer.status} size="sm" />
                         </div>
-                        {freelancer.status && (
-                          <motion.div
-                            className="absolute -bottom-1 -right-1"
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                          >
-                            <StatusIndicator status={freelancer.status} size="sm" />
-                          </motion.div>
-                        )}
-                      </motion.div>
+                      )}
+                    </div>
 
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className={`font-bold text-lg mb-1 truncate ${darkMode ? "text-white" : "text-gray-900"
-                          }`}>
+                    {/* Compact Info Section */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className={`font-bold text-sm md:text-base truncate ${darkMode ? "text-white" : "text-gray-900"}`}>
                           {fullName}
                         </h3>
-                        <p className={`text-sm font-medium mb-3 truncate ${darkMode ? "text-cyan-400" : "text-cyan-600"
-                          }`}>
+                        {index < 3 && !searchTerm && (
+                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${darkMode ? "bg-cyan-500/20 text-cyan-400" : "bg-cyan-100 text-cyan-700"}`}>
+                            Top
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-0.5">
+                        <p className={`text-xs font-semibold truncate ${darkMode ? "text-cyan-400" : "text-cyan-600"}`}>
                           {primarySkill}
                         </p>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <MapPin className={`w-4 h-4 ${darkMode ? "text-cyan-400" : "text-cyan-600"
-                              }`} />
-                            <span className={`text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
-                              }`}>
-                              {location}
-                            </span>
-                          </div>
-                          {monthlyRate !== "0" && (
-                            <div className="flex items-center gap-2">
-                              <Briefcase className={`w-4 h-4 ${darkMode ? "text-cyan-400" : "text-cyan-600"
-                                }`} />
-                              <span className={`text-xs font-bold ${darkMode ? "text-cyan-300" : "text-cyan-700"
-                                }`}>
-                                {monthlyRate} {currency}/mo
-                              </span>
-                            </div>
-                          )}
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className={`w-3 h-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`} />
+                          <span className={`text-[10px] md:text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                            {location}
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Skills */}
-                    {profile.skills && profile.skills.length > 0 && (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {profile.skills.slice(0, 3).map((skill, idx) => (
-                          <motion.span
-                            key={idx}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${darkMode
-                              ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 border border-cyan-500/30"
-                              : "bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 border border-cyan-200"
-                              }`}
-                          >
-                            {skill}
-                          </motion.span>
-                        ))}
-                        {profile.skills.length > 3 && (
-                          <motion.span
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold ${darkMode
-                              ? "bg-white/10 text-gray-400 border border-white/20"
-                              : "bg-gray-100 text-gray-600 border border-gray-200"
-                              }`}
-                          >
-                            +{profile.skills.length - 3} more
-                          </motion.span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="mt-6 flex gap-3">
+                    {/* Compact Action Section */}
+                    <div className="flex items-center gap-2">
                       <motion.button
-                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                          e.stopPropagation();
-                          handleViewProfile(freelancer);
-                        }}
-                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all ${darkMode
-                          ? "bg-white/10 hover:bg-white/20 text-white border-2 border-white/20 hover:border-white/40"
-                          : "bg-gray-100 hover:bg-gray-200 text-gray-900 border-2 border-gray-200 hover:border-gray-300"
-                          }`}
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        View Profile
-                      </motion.button>
-                      <motion.button
-                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
                           handleMessage(freelancer);
                         }}
-                        className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${darkMode
-                          ? "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg shadow-cyan-500/50"
-                          : "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg"
+                        className={`p-2 rounded-lg transition-all ${darkMode
+                          ? "bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20"
+                          : "bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border border-cyan-100"
                           }`}
-                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
+                        title="Send Message"
                       >
-                        <MessageCircle className="w-5 h-5" />
+                        <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
+                      </motion.button>
+                      <motion.button
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          handleViewProfile(freelancer);
+                        }}
+                        className={`px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold transition-all ${darkMode
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/10"
+                          : "bg-gradient-to-r from-cyan-600 to-blue-600 text-white"
+                          }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Profile
                       </motion.button>
                     </div>
                   </div>

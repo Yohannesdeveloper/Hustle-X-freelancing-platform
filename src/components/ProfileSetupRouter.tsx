@@ -32,7 +32,7 @@ const ProfileSetupRouter: React.FC = () => {
       const hasFreelancerProfile = user.profile?.freelancerProfileCompleted ||
         user.profile?.isProfileComplete ||
         (user.profile?.skills && user.profile?.skills.length > 0);
-      const hasClientProfile = user.hasCompanyProfile || user.companyProfile;
+      const hasClientProfile = user.hasCompanyProfile;
 
       // If user has both roles and both profiles are complete, go to role selection
       if (hasFreelancerRole && hasClientRole && hasFreelancerProfile && hasClientProfile) {
@@ -66,32 +66,17 @@ const ProfileSetupRouter: React.FC = () => {
         }
       }
 
-      // Only show wizard if user is NEW and explicitly needs to set up profile
-      // Check if this is a new signup (signupRole param present) vs existing user navigation
-      const isNewSignup = signupRole !== null && signupRole !== undefined;
-
-      // If user has freelancer role but no profile, only show wizard for new signups
-      if (hasFreelancerRole && !hasFreelancerProfile) {
-        if (isNewSignup && signupRole === 'freelancer') {
-          setIsLoading(false);
-          return;
-        } else {
-          // Existing user - go to dashboard anyway, they can complete profile later
-          navigate('/dashboard/freelancer', { replace: true });
-          return;
-        }
+      // All users without profiles must complete them (no distinction between new/existing)
+      // If user has client role but no profile, they must complete it
+      if (hasClientRole && !hasClientProfile) {
+        setIsLoading(false);
+        return; // Will show client wizard below
       }
 
-      // If user has client role but no profile, only show when explicitly signing up as client
-      if (hasClientRole && !hasClientProfile) {
-        if (isNewSignup && signupRole === 'client') {
-          setIsLoading(false);
-          return;
-        } else {
-          // Existing user - go to dashboard anyway
-          navigate('/dashboard/hiring', { replace: true });
-          return;
-        }
+      // If user has freelancer role but no profile, they must complete it
+      if (hasFreelancerRole && !hasFreelancerProfile) {
+        setIsLoading(false);
+        return; // Will show freelancer wizard below
       }
     }
 
@@ -110,39 +95,54 @@ const ProfileSetupRouter: React.FC = () => {
     );
   }
 
-  // Determine which wizard to show based on user's roles and signup role
-  // Only show wizard for NEW signups, not existing users
-  const isNewSignup = signupRole !== null && signupRole !== undefined;
-
+  // Determine which wizard to show based on role and profile completion
   const hasFreelancerProfile = user?.profile?.freelancerProfileCompleted ||
     user?.profile?.isProfileComplete ||
     (user?.profile?.skills && user?.profile?.skills.length > 0);
-  const hasClientProfile = user?.hasCompanyProfile || user?.companyProfile;
+  const hasClientProfile = user?.hasCompanyProfile;
 
-  const shouldShowFreelancerWizard = user?.roles?.includes('freelancer') &&
-    !hasFreelancerProfile && isNewSignup && signupRole === 'freelancer';
+  const hasFreelancerRole = user?.roles?.includes('freelancer');
+  const hasClientRole = user?.roles?.includes('client');
 
-  const shouldShowClientWizard = user?.roles?.includes('client') &&
-    !hasClientProfile && isNewSignup && signupRole === 'client';
+  // Determine which wizard to show based on role parameter and incomplete profiles
+  const shouldShowFreelancerWizard = hasFreelancerRole && !hasFreelancerProfile;
+  const shouldShowClientWizard = hasClientRole && !hasClientProfile;
 
-  // If user needs both profiles, prioritize based on signup role or show freelancer first
+  // Priority 1: If role is specified in URL, show that wizard (if applicable)
+  if (signupRole === 'client' && shouldShowClientWizard) {
+    return <ClientProfileWizard />;
+  }
+
+  if (signupRole === 'freelancer' && shouldShowFreelancerWizard) {
+    return <FreelancerProfileWizard />;
+  }
+
+  // Priority 2: If user has both incomplete profiles, show based on their roles
   if (shouldShowFreelancerWizard && shouldShowClientWizard) {
-    if (signupRole === 'client') {
+    // Default to showing client wizard if they have client role
+    if (hasClientRole) {
       return <ClientProfileWizard />;
     }
     return <FreelancerProfileWizard />;
+  }
+
+  // Priority 3: Show the wizard for whichever profile is incomplete
+  if (shouldShowClientWizard) {
+    return <ClientProfileWizard />;
   }
 
   if (shouldShowFreelancerWizard) {
     return <FreelancerProfileWizard />;
   }
 
-  if (shouldShowClientWizard) {
-    return <ClientProfileWizard />;
+  // Fallback - redirect based on user's role (profiles must be complete if we reach here)
+  if (user?.roles?.includes('client')) {
+    navigate('/dashboard/hiring', { replace: true });
+  } else if (user?.roles?.includes('freelancer')) {
+    navigate('/dashboard/freelancer', { replace: true });
+  } else {
+    navigate('/signup', { replace: true });
   }
-
-  // Fallback - redirect to dashboard if something goes wrong
-  navigate('/dashboard/freelancer', { replace: true });
   return null;
 };
 

@@ -19,27 +19,42 @@ const connectDB = async () => {
   }
 };
 
+const fs = require('fs');
+const path = require('path');
+
+const logToFile = (message) => {
+  fs.appendFileSync(path.join(__dirname, 'check_users_output.txt'), message + '\n');
+};
+
 const checkUsers = async () => {
   try {
-    await connectDB();
+    fs.writeFileSync(path.join(__dirname, 'check_users_output.txt'), ''); // Clear file
+    const conn = await mongoose.connect(
+      process.env.MONGODB_URI || "mongodb://localhost:27017/hustlex",
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
+    );
 
-    console.log("Checking existing users...");
+    logToFile(`MongoDB Connected: ${conn.connection.host}`);
+    logToFile("Checking existing users...");
 
     // Get all users
     const allUsers = await User.find({}).select('email roles currentRole profile.firstName profile.lastName').lean();
-    console.log(`Total users in database: ${allUsers.length}`);
+    logToFile(`Total users in database: ${allUsers.length}`);
 
     // Get freelancers specifically
     const freelancers = await User.find({ roles: { $in: ["freelancer"] } })
       .select('email roles currentRole profile.firstName profile.lastName profile.title')
       .lean();
 
-    console.log(`\nFreelancers found: ${freelancers.length}`);
+    logToFile(`\nFreelancers found: ${freelancers.length}`);
     freelancers.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.email} - ${user.roles} - ${user.currentRole}`);
+      logToFile(`${index + 1}. ${user.email} - ${user.roles} - ${user.currentRole}`);
       if (user.profile) {
-        console.log(`   Name: ${user.profile.firstName || ''} ${user.profile.lastName || ''}`.trim());
-        console.log(`   Title: ${user.profile.title || 'No title'}`);
+        logToFile(`   Name: ${user.profile.firstName || ''} ${user.profile.lastName || ''}`.trim());
+        logToFile(`   Title: ${user.profile.title || 'No title'}`);
       }
     });
 
@@ -48,13 +63,15 @@ const checkUsers = async () => {
       .select('email roles currentRole')
       .lean();
 
-    console.log(`\nClients found: ${clients.length}`);
+    logToFile(`\nClients found: ${clients.length}`);
     clients.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.email} - ${user.roles} - ${user.currentRole}`);
+      logToFile(`${index + 1}. ${user.email} - ${user.roles} - ${user.currentRole}`);
     });
 
+    logToFile("Check complete.");
     process.exit(0);
   } catch (error) {
+    logToFile(`Error checking users: ${error}`);
     console.error("Error checking users:", error);
     process.exit(1);
   }

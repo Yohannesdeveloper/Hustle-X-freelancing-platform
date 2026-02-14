@@ -19,80 +19,89 @@ const connectDB = async () => {
   }
 };
 
+const fs = require('fs');
+const path = require('path');
+
+const logToFile = (message) => {
+  fs.appendFileSync(path.join(__dirname, 'clear_users_output.txt'), message + '\n');
+  console.log(message);
+};
+
 const clearAllUsers = async () => {
   try {
+    fs.writeFileSync(path.join(__dirname, 'clear_users_output.txt'), ''); // Clear file
     await connectDB();
 
-    console.log("🔍 Checking existing users...");
+    logToFile("🔍 Checking existing users...");
 
     // Get all users count before deletion
     const allUsers = await User.find({})
       .select('email roles currentRole profile.firstName profile.lastName')
       .lean();
 
-    console.log(`Found ${allUsers.length} total users in database:`);
+    logToFile(`Found ${allUsers.length} total users in database:`);
     allUsers.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.email} - ${user.roles} - ${user.currentRole}`);
+      logToFile(`${index + 1}. ${user.email} - ${user.roles} - ${user.currentRole}`);
       if (user.profile) {
-        console.log(`   Name: ${user.profile.firstName || ''} ${user.profile.lastName || ''}`.trim());
+        logToFile(`   Name: ${user.profile.firstName || ''} ${user.profile.lastName || ''}`.trim());
       }
     });
 
     if (allUsers.length === 0) {
-      console.log('✅ No users found to clear. Database is already clean.');
+      logToFile('✅ No users found to clear. Database is already clean.');
       return;
     }
 
-    // Ask for confirmation
-    console.log(`\n⚠️  WARNING: This will permanently delete ${allUsers.length} users (freelancers and clients)!`);
-    console.log('This action cannot be undone.');
+    // Ask for confirmation (skipped for automated run)
+    logToFile(`\n⚠️  WARNING: This will permanently delete ${allUsers.length} users (freelancers and clients)!`);
+    logToFile('This action cannot be undone.');
 
     // For safety, we'll proceed with deletion
-    console.log('\n🗑️  Deleting all users...');
+    logToFile('\n🗑️  Deleting all users...');
 
     const result = await User.deleteMany({});
 
-    console.log(`✅ Successfully deleted ${result.deletedCount} users`);
+    logToFile(`✅ Successfully deleted ${result.deletedCount} users`);
 
     // Also clear related data
     try {
       // Clear all jobs
       const Job = mongoose.model('Job', new mongoose.Schema({}));
       const jobResult = await Job.deleteMany({});
-      console.log(`✅ Cleared ${jobResult.deletedCount} jobs`);
+      logToFile(`✅ Cleared ${jobResult.deletedCount} jobs`);
 
       // Clear all applications
       const Application = mongoose.model('Application', new mongoose.Schema({}));
       const appResult = await Application.deleteMany({});
-      console.log(`✅ Cleared ${appResult.deletedCount} applications`);
+      logToFile(`✅ Cleared ${appResult.deletedCount} applications`);
 
       // Clear all messages
       const Message = mongoose.model('Message', new mongoose.Schema({}));
       const messageResult = await Message.deleteMany({});
-      console.log(`✅ Cleared ${messageResult.deletedCount} messages`);
+      logToFile(`✅ Cleared ${messageResult.deletedCount} messages`);
 
       // Clear all companies
       const Company = mongoose.model('Company', new mongoose.Schema({}));
       const companyResult = await Company.deleteMany({});
-      console.log(`✅ Cleared ${companyResult.deletedCount} companies`);
+      logToFile(`✅ Cleared ${companyResult.deletedCount} companies`);
 
       // Clear all blogs
       const Blog = mongoose.model('Blog', new mongoose.Schema({}));
       const blogResult = await Blog.deleteMany({});
-      console.log(`✅ Cleared ${blogResult.deletedCount} blogs`);
+      logToFile(`✅ Cleared ${blogResult.deletedCount} blogs`);
 
     } catch (error) {
-      console.log('Some related data may not have been cleared:', error.message);
+      logToFile(`Some related data may not have been cleared: ${error.message}`);
     }
 
-    console.log('\n🎉 All users and related data cleared successfully!');
-    console.log('You can now start completely fresh with new accounts.');
+    logToFile('\n🎉 All users and related data cleared successfully!');
+    logToFile('You can now start completely fresh with new accounts.');
 
   } catch (error) {
-    console.error("❌ Error clearing users:", error);
+    logToFile(`❌ Error clearing users: ${error}`);
   } finally {
     await mongoose.connection.close();
-    console.log('Database connection closed.');
+    logToFile('Database connection closed.');
   }
 };
 

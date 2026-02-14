@@ -15,7 +15,8 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
   const showNavbar =
     location.pathname !== "/job-listings" &&
     !location.pathname.startsWith("/job-details") &&
-    location.pathname !== "/preview-job";
+    location.pathname !== "/preview-job" &&
+    location.pathname !== "/blog/post";
 
   return (
     <div

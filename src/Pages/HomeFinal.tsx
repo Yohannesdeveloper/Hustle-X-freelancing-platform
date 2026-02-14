@@ -295,16 +295,6 @@ const Home = () => {
                     </div>
                   )}
 
-                  {/* Dark mode quick toggle + attached profile/menu */}
-                  <div className="flex items-center gap-2">
-
-
-                    {/* Attached menu with profile + dark mode */}
-                    <div className="flex items-center">
-                      <FloatingDarkModeToggle />
-                    </div>
-                  </div>
-
                   {/* Language Selector */}
                   <div className="relative" ref={languageMenuRef}>
                     <motion.button
@@ -374,6 +364,16 @@ const Home = () => {
                         </motion.div>
                       )}
                     </AnimatePresence>
+                  </div>
+
+                  {/* Dark mode quick toggle + attached profile/menu */}
+                  <div className="flex items-center gap-2">
+
+
+                    {/* Attached menu with profile + dark mode */}
+                    <div className="flex items-center">
+                      <FloatingDarkModeToggle showProfileOption={false} />
+                    </div>
                   </div>
 
 
@@ -1817,7 +1817,7 @@ const Home = () => {
                         { text: t.footer.helpCenter, href: "/help-center" },
                         { text: t.footer.blog, href: "/blog" },
                         { text: t.footer.community, href: "https://t.me/HustleXet" },
-                        { text: t.footer.api, href: "/api", isInternal: true },
+
                       ],
                     },
                   ].map((section, idx) => (
@@ -1892,6 +1892,7 @@ const Home = () => {
                           icon: <FaXTwitter />,
                           color: "hover:text-cyan-400",
                           label: "X",
+                          href: "https://x.com/HustleX123",
                         },
                         {
                           icon: <FaLinkedin />,
@@ -1902,6 +1903,7 @@ const Home = () => {
                           icon: <FaInstagram />,
                           color: "hover:text-pink-400",
                           label: "Instagram",
+                          href: "https://www.instagram.com/hustlex123?igsh=cWdiYm8wbzF4ZTFk",
                         },
                         {
                           icon: <FaYoutube />,
